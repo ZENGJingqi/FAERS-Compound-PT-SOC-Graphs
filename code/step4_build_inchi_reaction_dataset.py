@@ -1,13 +1,19 @@
 ﻿#!/usr/bin/env python3
-"""Step4: build InChI-reaction datasets for modeling (without MedDRA dictionary).
+"""Step 4: Build intermediate InChI-reaction datasets.
+
+Purpose:
+- aggregate Step2 reactions against Step3 InChI-linked drug terms
+- retain intermediate InChI-based joins for recovery or audit purposes
+- export reusable sparse summaries before final InChIKey standardization
 
 Inputs:
-- step2 sqlite: case_drug, case_reaction
-- step3 sqlite: drug_term_final (InChI mapping)
+- outputs/step2/faers_step2.sqlite
+- outputs/step3/faers_step3.sqlite
 
 Outputs:
-- step4 sqlite with aggregated tables
-- model-ready sparse matrix CSVs from PS/SS subset
+- outputs/step4/faers_step4.sqlite
+- outputs/step4/*.csv
+- outputs/step4/*.json
 """
 
 from __future__ import annotations

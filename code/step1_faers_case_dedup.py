@@ -1,7 +1,18 @@
 ﻿#!/usr/bin/env python3
-"""Step 1: FAERS/AERS case-level ingestion, deduplication, and delete-list filtering.
+"""Step 1: FAERS/AERS case deduplication.
 
-This script builds a durable SQLite-backed case index from quarterly ZIP files.
+Purpose:
+- ingest quarterly FAERS/AERS DEMO and DELETE files
+- keep the latest valid case version for each case
+- record per-quarter ingestion and filtering statistics
+
+Inputs:
+- raw_data/faers_quarterly_archives/*.zip
+
+Outputs:
+- outputs/step1/faers_step1.sqlite
+- outputs/step1/*.csv
+- outputs/step1/*.json
 """
 
 from __future__ import annotations

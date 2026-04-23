@@ -1,11 +1,19 @@
 ﻿#!/usr/bin/env python3
-"""Step 2: Build standardized case-drug and case-reaction datasets.
+"""Step 2: Build standardized case-drug and case-reaction tables.
 
-Design highlights:
-- Filter DRUG/REAC rows using Step1 selected latest case keys.
-- Standardize drug/reaction strings conservatively.
-- Optional MedDRA PT/LLT mapping if a local MedDRA directory is provided.
-- Persist into SQLite with dedup constraints, then export CSVs.
+Purpose:
+- extract DRUG and REAC records for the deduplicated cases from Step1
+- standardize raw drug and reaction strings conservatively
+- persist reusable case_drug and case_reaction tables
+
+Inputs:
+- raw_data/faers_quarterly_archives/*.zip
+- outputs/step1/faers_step1.sqlite
+
+Outputs:
+- outputs/step2/faers_step2.sqlite
+- outputs/step2/*.csv
+- outputs/step2/*.json
 """
 
 from __future__ import annotations

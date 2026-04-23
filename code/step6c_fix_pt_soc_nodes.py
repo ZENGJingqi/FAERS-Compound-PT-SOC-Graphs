@@ -1,4 +1,20 @@
-﻿from __future__ import annotations
+"""Step 6c: Repair and summarize PT and SOC node tables.
+
+Purpose:
+- rebuild PT and SOC node tables from the aggregated Step6 graph edges
+- ensure PT-SOC links are consistent with MedDRA primary SOC assignments
+- refresh node and edge summary files for the full graph
+
+Inputs:
+- outputs/step6_core_graphs/core_graph_full/step6_compound_pt_soc_core_full.sqlite
+- reference_data/MedDRA/MedDRA_29_0_English/MedAscii/mdhier.asc
+
+Outputs:
+- outputs/step6_core_graphs/core_graph_full/node_summary.csv
+- outputs/step6_core_graphs/core_graph_full/edge_summary.csv
+"""
+
+from __future__ import annotations
 
 import sqlite3
 from pathlib import Path

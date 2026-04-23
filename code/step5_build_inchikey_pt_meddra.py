@@ -1,5 +1,20 @@
 #!/usr/bin/env python3
-"""Build MedDRA-standardized InChIKey-PT tables using Step4 + Step5 outputs."""
+"""Step 5 supplementary build of MedDRA-standardized InChIKey-PT tables.
+
+Purpose:
+- combine Step4 structure normalization with Step5 MedDRA mappings
+- materialize PS/SS InChIKey-PT evidence tables in final MedDRA PT space
+- export pair-level summaries for downstream graph construction
+
+Inputs:
+- outputs/step4/faers_step4.sqlite
+- outputs/step5/faers_step5.sqlite
+
+Outputs:
+- outputs/step5/faers_step5.sqlite
+- outputs/step5/*.csv
+- outputs/step5/*.json
+"""
 
 from __future__ import annotations
 
@@ -12,7 +27,7 @@ from pathlib import Path
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Build InChIKey-PT (MedDRA standardized, PS/SS)")
+    p = argparse.ArgumentParser(description="Step 5: build MedDRA-standardized InChIKey-PT tables")
     p.add_argument("--step4-db", type=Path, default=Path("outputs/step4/faers_step4.sqlite"))
     p.add_argument("--step5-db", type=Path, default=Path("outputs/step5/faers_step5.sqlite"))
     p.add_argument("--output-dir", type=Path, default=Path("outputs/step5"))

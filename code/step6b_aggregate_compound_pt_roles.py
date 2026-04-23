@@ -1,3 +1,21 @@
+"""Step 6b: Aggregate weighted compound-PT role edges.
+
+Purpose:
+- aggregate PS and SS report-level evidence into weighted compound-PT edges
+- attach MedDRA primary SOC relationships to the PT layer
+- create the full compound-PT-SOC core graph before pruning
+
+Inputs:
+- outputs/step5/faers_step5.sqlite
+- outputs/step4/faers_step4.sqlite
+- outputs/step6_core_graphs/core_graph_full/step6_compound_pt_soc_core_full.sqlite
+
+Outputs:
+- outputs/step6_core_graphs/core_graph_full/step6_compound_pt_soc_core_full.sqlite
+- outputs/step6_core_graphs/core_graph_full/*.csv
+- outputs/step6_core_graphs/core_graph_full/*.json
+"""
+
 from __future__ import annotations
 
 import json

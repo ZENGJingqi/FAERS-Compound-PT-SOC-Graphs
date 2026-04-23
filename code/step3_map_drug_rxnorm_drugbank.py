@@ -1,7 +1,20 @@
 ﻿#!/usr/bin/env python3
-"""Step3: map standardized case-drug terms to RxNorm and DrugBank(InChI).
+"""Step 3: Normalize drug terms and link them to RxNorm and DrugBank.
 
-This step does not depend on MedDRA and can run immediately.
+Purpose:
+- collapse standardized Step2 drug terms to unique normalized drug strings
+- map drug names to RxNorm-compatible ingredients or products
+- connect mapped drug names to DrugBank identifiers and InChI records
+
+Inputs:
+- outputs/step2/faers_step2.sqlite
+- reference_data/RxNorm_full_03022026/
+- reference_data/drugbank_5.1.15/
+
+Outputs:
+- outputs/step3/faers_step3.sqlite
+- outputs/step3/*.csv
+- outputs/step3/*.json
 """
 
 from __future__ import annotations

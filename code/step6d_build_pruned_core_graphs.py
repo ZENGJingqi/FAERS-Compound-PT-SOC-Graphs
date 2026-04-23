@@ -1,3 +1,19 @@
+"""Step 6d: Build pruned core graph releases.
+
+Purpose:
+- derive lighter public graph releases from the full Step6 core graph
+- keep only compound-PT edges above fixed `n_reports` thresholds
+- export ge10, ge20, and ge30 graph packages with summary files
+
+Inputs:
+- outputs/step6_core_graphs/core_graph_full/step6_compound_pt_soc_core_full.sqlite
+
+Outputs:
+- outputs/step6_core_graphs/core_graph_ge10/
+- outputs/step6_core_graphs/core_graph_ge20/
+- outputs/step6_core_graphs/core_graph_ge30/
+"""
+
 from __future__ import annotations
 
 import json

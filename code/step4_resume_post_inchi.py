@@ -1,9 +1,18 @@
 #!/usr/bin/env python3
-"""Step4 resume runner: continue from existing term->InChIKey mapping tables.
+"""Step 4 supplementary resume runner after structure normalization.
 
-Use this when step4_build_inchikey_reaction_dataset.py already finished the
-InChI normalization part (term_inchi_raw / inchi_norm_map / term_inchikey_map),
-but the downstream case/reaction aggregation was interrupted.
+Purpose:
+- resume Step4 after term-to-InChIKey normalization has already completed
+- rebuild downstream case/reaction aggregations without repeating RDKit work
+- provide a stable restart point for interrupted Step4 jobs
+
+Inputs:
+- outputs/step2/faers_step2.sqlite
+- outputs/step4/faers_step4.sqlite
+
+Outputs:
+- outputs/step4/*.csv
+- outputs/step4/*.json
 """
 
 from __future__ import annotations
@@ -17,7 +26,7 @@ from pathlib import Path
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Resume Step4 from post-InChI stage")
+    p = argparse.ArgumentParser(description="Step 4: resume aggregation from the post-InChIKey stage")
     p.add_argument(
         "--step2-db",
         type=Path,

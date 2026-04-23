@@ -1,5 +1,19 @@
 ﻿#!/usr/bin/env python3
-"""Incremental curation for Step3 unmapped drug names in 300-size batches."""
+"""Step 3 supplementary curation for unmapped drug names.
+
+Purpose:
+- review high-frequency unmapped Step3 drug terms in fixed-size batches
+- apply manual normalization choices before repeating RxNorm/DrugBank matching
+- save incremental curation decisions for reproducibility
+
+Inputs:
+- outputs/step3/faers_step3.sqlite
+- resources/step3_manual/
+
+Outputs:
+- outputs/step3/*.csv
+- resources/step3_manual/*.csv
+"""
 
 from __future__ import annotations
 

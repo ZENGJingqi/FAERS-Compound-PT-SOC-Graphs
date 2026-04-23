@@ -1,10 +1,19 @@
 #!/usr/bin/env python3
-"""Step5: MedDRA standardization for reactions using existing Step2 database.
+"""Step 5: Standardize reactions to MedDRA PT and primary SOC.
 
-This script does an incremental standardization pass:
-- Read distinct `pt_norm` from Step2 `case_reaction`.
-- Map to MedDRA v29 PT code/name by PT exact, LLT->PT, and curated manual code hints.
-- Build Step5 sqlite outputs with mapping tables and mapped reaction base for downstream Step4 rebuild.
+Purpose:
+- map normalized Step2 reaction terms to MedDRA PT codes and names
+- use exact PT matches, LLT-to-PT relationships, and curated manual hints
+- produce bilingual PT/SOC-ready reaction tables for final graph construction
+
+Inputs:
+- outputs/step2/faers_step2.sqlite
+- reference_data/MedDRA/MedDRA_29_0_English/
+
+Outputs:
+- outputs/step5/faers_step5.sqlite
+- outputs/step5/*.csv
+- outputs/step5/*.json
 """
 
 from __future__ import annotations
@@ -75,7 +84,7 @@ class MedDRAResources:
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Step5 MedDRA reaction standardization")
+    p = argparse.ArgumentParser(description="Step 5: standardize reactions to MedDRA PT and SOC")
     p.add_argument("--step2-db", type=Path, default=Path("outputs/step2/faers_step2.sqlite"))
     p.add_argument(
         "--meddra-dir",

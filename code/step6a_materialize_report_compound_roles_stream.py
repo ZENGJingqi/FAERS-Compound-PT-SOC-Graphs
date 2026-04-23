@@ -1,3 +1,19 @@
+"""Step 6a: Materialize report-compound role tables.
+
+Purpose:
+- expand standardized compounds to report-level PS and SS role tables
+- keep a durable report-compound layer before compound-PT aggregation
+- prepare the full core graph build from cleaned Step2 and Step4 outputs
+
+Inputs:
+- outputs/step2/faers_step2.sqlite
+- outputs/step4/faers_step4.sqlite
+
+Outputs:
+- outputs/step6_core_graphs/core_graph_full/step6_compound_pt_soc_core_full.sqlite
+- outputs/step6_core_graphs/core_graph_full/report_compound_role_summary.json
+"""
+
 from __future__ import annotations
 
 import json

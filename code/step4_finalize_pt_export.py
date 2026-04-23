@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
-"""Finalize Step4 from existing case_inchikey tables.
+"""Step 4 supplementary export from existing InChIKey tables.
 
-Expected precomputed tables:
-- term_inchi_raw
-- inchi_norm_map
-- term_inchikey_map
-- inchikey_meta
-- reaction_base
-- case_inchikey_any
-- case_inchikey_psss
-- inchikey_case_counts_any
-- inchikey_case_counts_psss
+Purpose:
+- continue Step4 from previously materialized structure tables
+- rebuild PT-level aggregate exports without repeating upstream normalization
+- provide a recovery path after interrupted long-running aggregations
+
+Inputs:
+- outputs/step4/faers_step4.sqlite
+
+Outputs:
+- outputs/step4/*.csv
+- outputs/step4/*.json
 """
 
 from __future__ import annotations
@@ -24,7 +25,7 @@ from pathlib import Path
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Finalize Step4 PT aggregation and exports")
+    p = argparse.ArgumentParser(description="Step 4: finalize PT-level exports from existing InChIKey tables")
     p.add_argument("--output-dir", type=Path, default=Path("outputs/step4"))
     p.add_argument("--min-pair-cases", type=int, default=20)
     p.add_argument("--include-any", action="store_true")

@@ -1,11 +1,19 @@
 ﻿#!/usr/bin/env python3
-"""Step4: build InChIKey-reaction dataset from Step2+Step3 (without MedDRA dict).
+"""Step 4: Standardize structures to InChIKey and aggregate reactions.
 
-Core logic:
-1) Take Step3 drug terms with non-empty InChI.
-2) Normalize InChI with RDKit (cleanup, fragment parent, uncharge, canonical tautomer).
-3) Use standardized InChIKey as unique drug structure id.
-4) Join with Step2 reactions by primaryid to build InChIKey-PT counts.
+Purpose:
+- normalize DrugBank-linked InChI records with RDKit
+- assign a canonical InChIKey, InChI, and SMILES to each structure
+- aggregate PS/SS report evidence at the InChIKey-reaction level
+
+Inputs:
+- outputs/step2/faers_step2.sqlite
+- outputs/step3/faers_step3.sqlite
+
+Outputs:
+- outputs/step4/faers_step4.sqlite
+- outputs/step4/*.csv
+- outputs/step4/*.json
 """
 
 from __future__ import annotations
@@ -37,7 +45,7 @@ class InchiNormRow:
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Build InChIKey-reaction dataset")
+    p = argparse.ArgumentParser(description="Step 4: build the standardized InChIKey-reaction dataset")
     p.add_argument(
         "--step2-db",
         type=Path,

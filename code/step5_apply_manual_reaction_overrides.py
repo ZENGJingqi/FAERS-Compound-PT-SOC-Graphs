@@ -1,5 +1,21 @@
 #!/usr/bin/env python3
-"""Apply manual MedDRA overrides for unresolved reaction terms in Step5 outputs."""
+"""Step 5 supplementary manual override application.
+
+Purpose:
+- apply curated MedDRA overrides to unresolved reaction terms
+- improve PT coverage after the main automated Step5 mapping pass
+- preserve a reproducible manual override table for audit
+
+Inputs:
+- outputs/step2/faers_step2.sqlite
+- outputs/step5/faers_step5.sqlite
+- resources/step5_manual/reaction_term_manual_overrides_*.csv
+
+Outputs:
+- outputs/step5/faers_step5.sqlite
+- outputs/step5/*.csv
+- outputs/step5/*.json
+"""
 
 from __future__ import annotations
 
@@ -12,7 +28,7 @@ from pathlib import Path
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Apply manual reaction MedDRA overrides")
+    p = argparse.ArgumentParser(description="Step 5: apply curated manual MedDRA overrides")
     p.add_argument("--step2-db", type=Path, default=Path("outputs/step2/faers_step2.sqlite"))
     p.add_argument("--step5-db", type=Path, default=Path("outputs/step5/faers_step5.sqlite"))
     p.add_argument(

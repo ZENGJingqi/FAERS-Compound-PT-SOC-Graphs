@@ -1,4 +1,22 @@
-﻿from __future__ import annotations
+"""Step 6e: Add bilingual labels and final reference tables.
+
+Purpose:
+- enrich the Step6 graphs with English and Chinese PT/SOC names
+- export lightweight compound, PT, SOC, and association reference tables
+- finalize the cleaned outputs used by the data manual and public release
+
+Inputs:
+- outputs/step6_core_graphs/core_graph_full/step6_compound_pt_soc_core_full.sqlite
+- reference_data/MedDRA/MedDRA_29_0_English/
+- reference_data/MedDRA/MedDRA_29_0_Chinese/
+
+Outputs:
+- outputs/reference_tables/*.xlsx
+- outputs/reference_tables/*.csv.gz
+- updated bilingual columns inside Step6 graph SQLite files
+"""
+
+from __future__ import annotations
 
 import sqlite3
 from pathlib import Path
