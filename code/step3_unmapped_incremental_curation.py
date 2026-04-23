@@ -511,13 +511,15 @@ def is_non_drug_term(term: str) -> bool:
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Incremental curation for step3 unmapped terms")
-    p.add_argument("--base-final-csv", type=Path, default=Path(r"smiles_adr_project\\outputs\\step3\\drug_term_final.csv"))
-    p.add_argument("--unmapped-csv", type=Path, default=Path(r"smiles_adr_project\\outputs\\step3\\unmapped_drug_terms_top.csv"))
-    p.add_argument("--rxnconso", type=Path, default=Path(r"RxNorm_full_03022026\\rrf\\RXNCONSO.RRF"))
-    p.add_argument("--rxnrel", type=Path, default=Path(r"RxNorm_full_03022026\\rrf\\RXNREL.RRF"))
-    p.add_argument("--drugbank-dir", type=Path, default=Path(r"drugbank_5.1.15"))
-    p.add_argument("--manual-dir", type=Path, default=Path(r"smiles_adr_project\\resources\\step3_manual"))
-    p.add_argument("--output-dir", type=Path, default=Path(r"smiles_adr_project\\outputs\\step3"))
+    project_root = Path(__file__).resolve().parents[1]
+    data_root = project_root.parents[1]
+    p.add_argument("--base-final-csv", type=Path, default=project_root / "outputs" / "step3" / "drug_term_final.csv")
+    p.add_argument("--unmapped-csv", type=Path, default=project_root / "outputs" / "step3" / "unmapped_drug_terms_top.csv")
+    p.add_argument("--rxnconso", type=Path, default=data_root / "reference_data" / "RxNorm_full_03022026" / "rrf" / "RXNCONSO.RRF")
+    p.add_argument("--rxnrel", type=Path, default=data_root / "reference_data" / "RxNorm_full_03022026" / "rrf" / "RXNREL.RRF")
+    p.add_argument("--drugbank-dir", type=Path, default=data_root / "reference_data" / "drugbank_5.1.15")
+    p.add_argument("--manual-dir", type=Path, default=project_root / "resources" / "step3_manual")
+    p.add_argument("--output-dir", type=Path, default=project_root / "outputs" / "step3")
     p.add_argument("--batch-size", type=int, default=300)
     p.add_argument("--top-n", type=int, default=5000)
     p.add_argument("--all-unmapped", action="store_true")

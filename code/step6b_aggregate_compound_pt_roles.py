@@ -15,7 +15,7 @@ OUT_DB_REL = "outputs/step6_core_graphs/core_graph_full/step6_compound_pt_soc_co
 STEP5_DB = ROOT / "outputs" / "step5" / "faers_step5.sqlite"
 STEP4_DB = ROOT / "outputs" / "step4" / "faers_step4.sqlite"
 STEP5_DB_REL = "outputs/step5/faers_step5.sqlite"
-MEDDRA_MDHIER_REL = "../MedDRA/MedDRA_29_0_English/MedAscii/mdhier.asc"
+MEDDRA_MDHIER = ROOT.parents[1] / "reference_data" / "MedDRA" / "MedDRA_29_0_English" / "MedAscii" / "mdhier.asc"
 
 BATCH_SIZE = 100_000
 
@@ -31,7 +31,7 @@ def scalar(conn: sqlite3.Connection, q: str):
 def load_pt_soc_from_meddra() -> pd.DataFrame:
     rows_primary = []
     rows_fallback = []
-    with Path(MEDDRA_MDHIER_REL).open("r", encoding="latin-1") as f:
+    with MEDDRA_MDHIER.open("r", encoding="latin-1") as f:
         for line in f:
             parts = line.rstrip("\n\r").split("$")
             if len(parts) < 12:

@@ -18,7 +18,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--meddra-dir",
         type=Path,
-        default=Path(r"..\MedDRA\MedDRA_29_0_English"),
+        default=Path(__file__).resolve().parents[2] / "reference_data" / "MedDRA" / "MedDRA_29_0_English",
         help="Path containing MedAscii/pt.asc for fallback PT code->name lookup",
     )
     p.add_argument(

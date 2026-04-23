@@ -32,6 +32,26 @@ The released workflow covers only:
 - `figures/`: workflow and graph summary figures
 - `graphs/`: three pruned graph archives compressed as `.sqlite.gz`
 
+## Expected Local Layout For Reproduction
+
+The scripts assume the repository is placed beside two user-supplied directories:
+
+```text
+your_working_directory/
+├─ FAERS-Compound-PT-SOC-Graphs/
+├─ raw_data/
+│  └─ faers_quarterly_archives/
+└─ reference_data/
+   ├─ RxNorm_full_03022026/
+   ├─ drugbank_5.1.15/
+   └─ MedDRA/
+```
+
+In other words:
+
+- raw FAERS/AERS ZIP files should be placed in `../raw_data/faers_quarterly_archives/`
+- reference datasets should be placed in `../reference_data/`
+
 ## Core Graph Schema
 
 Each released core graph keeps only:

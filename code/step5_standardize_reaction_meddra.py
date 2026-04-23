@@ -80,7 +80,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--meddra-dir",
         type=Path,
-        default=Path(r"..\MedDRA\MedDRA_29_0_English"),
+        default=Path(__file__).resolve().parents[2] / "reference_data" / "MedDRA" / "MedDRA_29_0_English",
         help="Path containing MedAscii/pt.asc and MedAscii/llt.asc",
     )
     p.add_argument("--output-dir", type=Path, default=Path("outputs/step5"))

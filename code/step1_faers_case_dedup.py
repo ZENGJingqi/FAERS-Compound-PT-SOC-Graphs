@@ -555,13 +555,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--data-root",
         type=Path,
-        default=Path(r"D:\博士文件\TCMMKG\data\AEMS_FDA不良反应数据"),
+        default=Path(__file__).resolve().parents[2] / "raw_data" / "faers_quarterly_archives",
         help="Directory containing quarterly *aers_ascii_*.zip files",
     )
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=Path(r"D:\博士文件\TCMMKG\data\AEMS_FDA不良反应数据\smiles_adr_project\outputs\step1"),
+        default=Path(__file__).resolve().parents[1] / "outputs" / "step1",
         help="Directory for step1 outputs",
     )
     parser.add_argument(
@@ -629,3 +629,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

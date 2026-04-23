@@ -10,6 +10,23 @@ The preprocessing workflow used the following local datasets:
 4. MedDRA `29.0` English
 5. MedDRA `29.0` Chinese
 
+## 1.1 Expected reproduction layout
+
+To run the public scripts as documented, place the cloned repository beside `raw_data/` and `reference_data/`:
+
+```text
+your_working_directory/
+├─ FAERS-Compound-PT-SOC-Graphs/
+├─ raw_data/
+│  └─ faers_quarterly_archives/
+└─ reference_data/
+   ├─ RxNorm_full_03022026/
+   ├─ drugbank_5.1.15/
+   └─ MedDRA/
+```
+
+This is the directory convention assumed by the default script arguments in `code/`.
+
 ## 2. Step1-Step6 workflow
 
 ### Step1. Case deduplication
@@ -48,7 +65,7 @@ The final core graph keeps only:
 
 ## 3. Full cleaned reference data retained locally
 
-The local non-public expert package retains:
+The local working project retains:
 
 - all compounds: 3,732 rows
 - all PT nodes: 21,674 rows

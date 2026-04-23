@@ -647,28 +647,28 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--step2-db",
         type=Path,
-        default=Path(r"D:\博士文件\TCMMKG\data\AEMS_FDA不良反应数据\smiles_adr_project\outputs\step2\faers_step2.sqlite"),
+        default=Path(__file__).resolve().parents[1] / "outputs" / "step2" / "faers_step2.sqlite",
     )
     p.add_argument(
         "--rxnconso",
         type=Path,
-        default=Path(r"D:\博士文件\TCMMKG\data\AEMS_FDA不良反应数据\RxNorm_full_03022026\rrf\RXNCONSO.RRF"),
+        default=Path(__file__).resolve().parents[2] / "reference_data" / "RxNorm_full_03022026" / "rrf" / "RXNCONSO.RRF",
     )
     p.add_argument(
         "--drugbank-dir",
         type=Path,
-        default=Path(r"D:\博士文件\TCMMKG\data\AEMS_FDA不良反应数据\drugbank_5.1.15"),
+        default=Path(__file__).resolve().parents[2] / "reference_data" / "drugbank_5.1.15",
     )
     p.add_argument(
         "--output-dir",
         type=Path,
-        default=Path(r"D:\博士文件\TCMMKG\data\AEMS_FDA不良反应数据\smiles_adr_project\outputs\step3"),
+        default=Path(__file__).resolve().parents[1] / "outputs" / "step3",
     )
     p.add_argument(
         "--manual-corrections",
         type=Path,
         default=Path(
-            r"D:\博士文件\TCMMKG\data\AEMS_FDA不良反应数据\smiles_adr_project\resources\step3_manual\corrections_batch1_top300.csv"
+            str(Path(__file__).resolve().parents[1] / "resources" / "step3_manual" / "corrections_batch1_top300.csv")
         ),
     )
     p.add_argument("--rebuild", action="store_true")
@@ -831,3 +831,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

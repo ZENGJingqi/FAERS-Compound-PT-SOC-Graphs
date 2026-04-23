@@ -1,11 +1,9 @@
-﻿#!/usr/bin/env python3
-"""Step4: build InChIKey-reaction dataset from Step2+Step3 (without MedDRA dict).
+#!/usr/bin/env python3
+"""Step4 resume runner: continue from existing term->InChIKey mapping tables.
 
-Core logic:
-1) Take Step3 drug terms with non-empty InChI.
-2) Normalize InChI with RDKit (cleanup, fragment parent, uncharge, canonical tautomer).
-3) Use standardized InChIKey as unique drug structure id.
-4) Join with Step2 reactions by primaryid to build InChIKey-PT counts.
+Use this when step4_build_inchikey_reaction_dataset.py already finished the
+InChI normalization part (term_inchi_raw / inchi_norm_map / term_inchikey_map),
+but the downstream case/reaction aggregation was interrupted.
 """
 
 from __future__ import annotations
@@ -15,56 +13,47 @@ import csv
 import datetime as dt
 import json
 import sqlite3
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, List, Sequence, Tuple
-
-from rdkit import Chem
-from rdkit.Chem import inchi as rd_inchi
-from rdkit.Chem.MolStandardize import rdMolStandardize
-
-
-@dataclass
-class InchiNormRow:
-    inchi_raw: str
-    status: str
-    inchikey: str
-    inchi_std: str
-    smiles_std: str
-    n_frag_before: int
-    n_frag_after: int
-    note: str
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Build InChIKey-reaction dataset")
+    p = argparse.ArgumentParser(description="Resume Step4 from post-InChI stage")
     p.add_argument(
         "--step2-db",
         type=Path,
-        default=Path(__file__).resolve().parents[1] / "outputs" / "step2" / "faers_step2.sqlite",
-    )
-    p.add_argument(
-        "--step3-db",
-        type=Path,
-        default=Path(__file__).resolve().parents[1] / "outputs" / "step3" / "faers_step3.sqlite",
+        default=Path("outputs/step2/faers_step2.sqlite"),
     )
     p.add_argument(
         "--output-dir",
         type=Path,
-        default=Path(__file__).resolve().parents[1] / "outputs" / "step4",
+        default=Path("outputs/step4"),
     )
     p.add_argument("--min-pair-cases", type=int, default=20)
     p.add_argument(
         "--include-any",
         action="store_true",
-        help="Also build all-role (ANY) InChIKey-PT aggregation (much heavier).",
+        help="Also build all-role (ANY) inchikey-PT aggregation (much heavier).",
     )
-    p.add_argument("--rebuild", action="store_true")
+    p.add_argument(
+        "--rebuild-reaction-base",
+        action="store_true",
+        help="Force rebuilding reaction_base from step2.case_reaction.",
+    )
     return p.parse_args()
 
 
 def scalar(conn: sqlite3.Connection, q: str) -> int:
     return int(conn.execute(q).fetchone()[0])
+
+
+def table_exists(conn: sqlite3.Connection, table_name: str) -> bool:
+    q = """
+        SELECT 1
+        FROM sqlite_master
+        WHERE type='table' AND name=?
+        LIMIT 1
+    """
+    return conn.execute(q, (table_name,)).fetchone() is not None
 
 
 def export_csv(conn: sqlite3.Connection, sql: str, out_path: Path) -> int:
@@ -82,248 +71,54 @@ def export_csv(conn: sqlite3.Connection, sql: str, out_path: Path) -> int:
     return n
 
 
-def init_db(conn: sqlite3.Connection, rebuild: bool) -> None:
-    conn.execute("PRAGMA journal_mode = WAL;")
-    conn.execute("PRAGMA synchronous = NORMAL;")
-    conn.execute("PRAGMA temp_store = FILE;")
-    cur = conn.cursor()
-    if rebuild:
-        cur.executescript(
-            """
-            DROP TABLE IF EXISTS term_inchi_raw;
-            DROP TABLE IF EXISTS inchi_norm_map;
-            DROP TABLE IF EXISTS term_inchikey_map;
-            DROP TABLE IF EXISTS inchikey_meta;
-            DROP TABLE IF EXISTS reaction_base;
-            DROP TABLE IF EXISTS case_inchikey_any;
-            DROP TABLE IF EXISTS case_inchikey_psss;
-            DROP TABLE IF EXISTS inchikey_case_counts_any;
-            DROP TABLE IF EXISTS inchikey_case_counts_psss;
-            DROP TABLE IF EXISTS inchikey_pt_counts_any;
-            DROP TABLE IF EXISTS inchikey_pt_counts_psss;
-            DROP TABLE IF EXISTS inchikey_pt_psss_model;
-            DROP TABLE IF EXISTS inchikey_index;
-            DROP TABLE IF EXISTS pt_index;
-            DROP TABLE IF EXISTS inchikey_pt_matrix_psss;
-            """
-        )
-    conn.commit()
-
-
-def normalize_inchi(raw_inchi: str, uncharger: rdMolStandardize.Uncharger, taut_enum: rdMolStandardize.TautomerEnumerator) -> InchiNormRow:
-    raw = (raw_inchi or "").strip()
-    if not raw:
-        return InchiNormRow(raw, "EMPTY", "", "", "", 0, 0, "empty input")
-
-    try:
-        mol = rd_inchi.MolFromInchi(raw, sanitize=True, removeHs=True)
-    except Exception as exc:
-        return InchiNormRow(raw, "PARSE_FAIL", "", "", "", 0, 0, f"MolFromInchi error: {exc}")
-
-    if mol is None:
-        return InchiNormRow(raw, "PARSE_FAIL", "", "", "", 0, 0, "MolFromInchi returned None")
-
-    try:
-        n_frag_before = len(Chem.GetMolFrags(mol))
-        mol = rdMolStandardize.Cleanup(mol)
-        mol = rdMolStandardize.FragmentParent(mol)
-        mol = uncharger.uncharge(mol)
-        mol = rdMolStandardize.Cleanup(mol)
-        mol = taut_enum.Canonicalize(mol)
-        if mol is None or mol.GetNumAtoms() == 0:
-            return InchiNormRow(raw, "EMPTY_PARENT", "", "", "", n_frag_before, 0, "empty parent after standardize")
-
-        n_frag_after = len(Chem.GetMolFrags(mol))
-        smiles_std = Chem.MolToSmiles(mol, canonical=True, isomericSmiles=True)
-        inchi_std = rd_inchi.MolToInchi(mol)
-        if not inchi_std:
-            return InchiNormRow(raw, "INCHI_FAIL", "", "", smiles_std, n_frag_before, n_frag_after, "MolToInchi empty")
-        inchikey = rd_inchi.InchiToInchiKey(inchi_std)
-        if not inchikey:
-            return InchiNormRow(raw, "INCHIKEY_FAIL", "", inchi_std, smiles_std, n_frag_before, n_frag_after, "InchiToInchiKey empty")
-
-        note = "ok"
-        if n_frag_before > 1:
-            note = f"fragment_parent_from_{n_frag_before}"
-        return InchiNormRow(raw, "OK", inchikey, inchi_std, smiles_std, n_frag_before, n_frag_after, note)
-    except Exception as exc:
-        return InchiNormRow(raw, "STANDARDIZE_FAIL", "", "", "", 0, 0, f"standardize error: {exc}")
-
-
-def build_inchi_norm_map(conn: sqlite3.Connection) -> Tuple[int, int]:
-    cur = conn.cursor()
-    raw_inchis = [r[0] for r in cur.execute("SELECT DISTINCT inchi_raw FROM term_inchi_raw WHERE TRIM(COALESCE(inchi_raw,''))<>''")]
-
-    uncharger = rdMolStandardize.Uncharger()
-    taut_enum = rdMolStandardize.TautomerEnumerator()
-
-    norm_rows: List[Tuple[str, str, str, str, str, int, int, str]] = []
-    ok = 0
-    for raw in raw_inchis:
-        nr = normalize_inchi(raw, uncharger, taut_enum)
-        if nr.status == "OK":
-            ok += 1
-        norm_rows.append(
-            (
-                nr.inchi_raw,
-                nr.status,
-                nr.inchikey,
-                nr.inchi_std,
-                nr.smiles_std,
-                nr.n_frag_before,
-                nr.n_frag_after,
-                nr.note,
-            )
-        )
-
-    cur.execute("DROP TABLE IF EXISTS inchi_norm_map")
-    cur.execute(
-        """
-        CREATE TABLE inchi_norm_map (
-            inchi_raw TEXT PRIMARY KEY,
-            status TEXT NOT NULL,
-            inchikey TEXT,
-            inchi_std TEXT,
-            smiles_std TEXT,
-            n_frag_before INTEGER,
-            n_frag_after INTEGER,
-            note TEXT
-        )
-        """
-    )
-    cur.executemany(
-        """
-        INSERT INTO inchi_norm_map(
-            inchi_raw,status,inchikey,inchi_std,smiles_std,n_frag_before,n_frag_after,note
-        ) VALUES (?,?,?,?,?,?,?,?)
-        """,
-        norm_rows,
-    )
-    cur.executescript(
-        """
-        CREATE INDEX idx_inchi_norm_status ON inchi_norm_map(status);
-        CREATE INDEX idx_inchi_norm_inchikey ON inchi_norm_map(inchikey);
-        """
-    )
-    conn.commit()
-    return len(raw_inchis), ok
-
-
 def main() -> int:
     args = parse_args()
     started = dt.datetime.now().isoformat(timespec="seconds")
 
     if not args.step2_db.exists():
-        print(f"[ERROR] step2 db not found: {args.step2_db}")
-        return 1
-    if not args.step3_db.exists():
-        print(f"[ERROR] step3 db not found: {args.step3_db}")
+        print(f"[ERROR] step2 db not found: {args.step2_db}", flush=True)
         return 1
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     step4_db = args.output_dir / "faers_step4.sqlite"
+    if not step4_db.exists():
+        print(f"[ERROR] step4 db not found: {step4_db}", flush=True)
+        return 1
 
     conn = sqlite3.connect(step4_db)
     try:
-        init_db(conn, rebuild=args.rebuild)
+        conn.execute("PRAGMA journal_mode = WAL;")
+        conn.execute("PRAGMA synchronous = NORMAL;")
+        conn.execute("PRAGMA temp_store = FILE;")
         conn.execute("ATTACH DATABASE ? AS s2", (str(args.step2_db),))
-        conn.execute("ATTACH DATABASE ? AS s3", (str(args.step3_db),))
 
-        print("[INFO] extracting term_inchi_raw from step3 ...", flush=True)
-        conn.executescript(
-            """
-            DROP TABLE IF EXISTS term_inchi_raw;
-            CREATE TABLE term_inchi_raw AS
-            SELECT
-                term_std,
-                term_norm,
-                n_rows,
-                n_cases,
-                dbid,
-                drugbank_name,
-                inchi AS inchi_raw,
-                mapping_stage,
-                manual_action,
-                manual_target
-            FROM s3.drug_term_final
-            WHERE TRIM(COALESCE(inchi,'')) <> ''
-              AND UPPER(TRIM(COALESCE(mapping_stage,''))) <> 'MANUAL_EXCLUDE';
+        required = ["term_inchi_raw", "inchi_norm_map", "term_inchikey_map", "inchikey_meta"]
+        missing = [t for t in required if not table_exists(conn, t)]
+        if missing:
+            print(f"[ERROR] missing required precomputed tables: {missing}", flush=True)
+            print("[ERROR] rerun: step4_build_inchikey_reaction_dataset.py --rebuild", flush=True)
+            return 1
 
-            CREATE INDEX idx_term_inchi_raw_term ON term_inchi_raw(term_std);
-            CREATE INDEX idx_term_inchi_raw_inchi ON term_inchi_raw(inchi_raw);
-            """
-        )
-        conn.commit()
+        if args.rebuild_reaction_base or (not table_exists(conn, "reaction_base")):
+            print("[INFO] building reaction_base ...", flush=True)
+            conn.executescript(
+                """
+                DROP TABLE IF EXISTS reaction_base;
+                CREATE TABLE reaction_base AS
+                SELECT DISTINCT
+                    primaryid,
+                    caseid,
+                    pt_norm
+                FROM s2.case_reaction
+                WHERE TRIM(COALESCE(pt_norm,'')) <> '';
 
-        print("[INFO] RDKit normalizing InChI -> InChIKey/SMILES ...", flush=True)
-        raw_inchi_total, norm_ok_total = build_inchi_norm_map(conn)
-
-        print("[INFO] building term_inchikey_map and inchikey_meta ...", flush=True)
-        conn.executescript(
-            """
-            DROP TABLE IF EXISTS term_inchikey_map;
-            CREATE TABLE term_inchikey_map AS
-            SELECT
-                t.term_std,
-                t.term_norm,
-                t.n_rows,
-                t.n_cases,
-                t.dbid,
-                t.drugbank_name,
-                t.inchi_raw,
-                n.inchikey,
-                n.inchi_std,
-                n.smiles_std,
-                n.n_frag_before,
-                n.n_frag_after,
-                n.note AS norm_note,
-                t.mapping_stage,
-                t.manual_action,
-                t.manual_target
-            FROM term_inchi_raw t
-            INNER JOIN inchi_norm_map n
-                ON t.inchi_raw = n.inchi_raw
-            WHERE n.status = 'OK'
-              AND TRIM(COALESCE(n.inchikey,'')) <> '';
-
-            CREATE INDEX idx_term_inchikey_term ON term_inchikey_map(term_std);
-            CREATE INDEX idx_term_inchikey_key ON term_inchikey_map(inchikey);
-
-            DROP TABLE IF EXISTS inchikey_meta;
-            CREATE TABLE inchikey_meta AS
-            SELECT
-                inchikey,
-                MIN(inchi_std) AS inchi_std,
-                MIN(smiles_std) AS smiles_std,
-                COUNT(DISTINCT term_std) AS term_count,
-                COUNT(DISTINCT dbid) AS dbid_count,
-                GROUP_CONCAT(DISTINCT dbid) AS dbid_list,
-                GROUP_CONCAT(DISTINCT drugbank_name) AS drugbank_name_list
-            FROM term_inchikey_map
-            GROUP BY inchikey;
-
-            CREATE INDEX idx_inchikey_meta_key ON inchikey_meta(inchikey);
-            """
-        )
-        conn.commit()
-
-        print("[INFO] preparing reaction base ...", flush=True)
-        conn.executescript(
-            """
-            DROP TABLE IF EXISTS reaction_base;
-            CREATE TABLE reaction_base AS
-            SELECT DISTINCT
-                primaryid,
-                caseid,
-                pt_norm
-            FROM s2.case_reaction
-            WHERE TRIM(COALESCE(pt_norm,'')) <> '';
-
-            CREATE INDEX idx_reaction_base_primaryid ON reaction_base(primaryid);
-            CREATE INDEX idx_reaction_base_pt ON reaction_base(pt_norm);
-            """
-        )
-        conn.commit()
+                CREATE INDEX idx_reaction_base_primaryid ON reaction_base(primaryid);
+                CREATE INDEX idx_reaction_base_pt ON reaction_base(pt_norm);
+                """
+            )
+            conn.commit()
+        else:
+            print("[INFO] reusing existing reaction_base ...", flush=True)
 
         print("[INFO] building case_inchikey_any/psss ...", flush=True)
         conn.executescript(
@@ -362,7 +157,7 @@ def main() -> int:
         )
         conn.commit()
 
-        print("[INFO] aggregating inchikey counts ...", flush=True)
+        print("[INFO] aggregating inchikey case counts ...", flush=True)
         conn.executescript(
             """
             DROP TABLE IF EXISTS inchikey_case_counts_any;
@@ -538,13 +333,14 @@ def main() -> int:
         summary = {
             "started_at": started,
             "finished_at": finished,
+            "runner": "step4_resume_post_inchi.py",
             "min_pair_cases": args.min_pair_cases,
             "include_any": bool(args.include_any),
             "term_inchi_raw_rows": scalar(conn, "SELECT COUNT(*) FROM term_inchi_raw"),
             "term_inchi_raw_distinct_terms": scalar(conn, "SELECT COUNT(DISTINCT term_std) FROM term_inchi_raw"),
             "term_inchi_raw_distinct_inchi": scalar(conn, "SELECT COUNT(DISTINCT inchi_raw) FROM term_inchi_raw"),
-            "raw_inchi_total": raw_inchi_total,
-            "raw_inchi_norm_ok": norm_ok_total,
+            "raw_inchi_total": scalar(conn, "SELECT COUNT(*) FROM inchi_norm_map"),
+            "raw_inchi_norm_ok": scalar(conn, "SELECT COUNT(*) FROM inchi_norm_map WHERE status='OK'"),
             "inchi_norm_rows": n_inchi_norm,
             "term_inchikey_map_rows": n_term_map,
             "inchikey_meta_rows": n_meta,
@@ -567,14 +363,13 @@ def main() -> int:
                 "multi_fragment_before": scalar(conn, "SELECT COUNT(*) FROM inchi_norm_map WHERE n_frag_before > 1"),
             },
         }
-
         (args.output_dir / "step4_report.json").write_text(
             json.dumps(summary, ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
 
         conn.execute("PRAGMA wal_checkpoint(TRUNCATE);")
-        print("[DONE] Step4 completed", flush=True)
+        print("[DONE] Step4 resume completed", flush=True)
         print(json.dumps(summary, ensure_ascii=False, indent=2), flush=True)
         return 0
     finally:
@@ -583,4 +378,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

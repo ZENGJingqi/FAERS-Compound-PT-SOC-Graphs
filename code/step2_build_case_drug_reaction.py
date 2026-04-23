@@ -766,17 +766,17 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--data-root",
         type=Path,
-        default=Path(r"D:\博士文件\TCMMKG\data\AEMS_FDA不良反应数据"),
+        default=Path(__file__).resolve().parents[2] / "raw_data" / "faers_quarterly_archives",
     )
     p.add_argument(
         "--step1-keys",
         type=Path,
-        default=Path(r"D:\博士文件\TCMMKG\data\AEMS_FDA不良反应数据\smiles_adr_project\outputs\step1\faers_latest_case_keys.csv"),
+        default=Path(__file__).resolve().parents[1] / "outputs" / "step1" / "faers_latest_case_keys.csv",
     )
     p.add_argument(
         "--output-dir",
         type=Path,
-        default=Path(r"D:\博士文件\TCMMKG\data\AEMS_FDA不良反应数据\smiles_adr_project\outputs\step2"),
+        default=Path(__file__).resolve().parents[1] / "outputs" / "step2",
     )
     p.add_argument(
         "--meddra-dir",
@@ -932,3 +932,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
