@@ -1,6 +1,6 @@
 # FAERS Compound-PT-SOC Graphs
 
-This repository contains the Step1-Step6 preprocessing workflow and three final FAERS core graph releases used to organize standardized compound-PT-SOC relationships. It does not include any downstream modeling or prediction results.
+This repository contains the Step1-Step6 preprocessing workflow, three final FAERS core graph releases, and three lightweight reference tables used to organize standardized compound-PT-SOC relationships. It does not include any downstream modeling or prediction results.
 
 ## Workflow Overview
 
@@ -31,6 +31,7 @@ The released workflow covers only:
 - `docs/`: English process notes, execution notes, and graph release notes
 - `figures/`: workflow and graph summary figures
 - `graphs/`: three pruned graph archives compressed as `.sqlite.gz`
+- `tables/`: three curated reference tables for compounds, PT terms, and SOC terms
 
 ## Expected Local Layout For Reproduction
 
@@ -38,13 +39,13 @@ The scripts assume the repository is placed beside two user-supplied directories
 
 ```text
 your_working_directory/
-├─ FAERS-Compound-PT-SOC-Graphs/
-├─ raw_data/
-│  └─ faers_quarterly_archives/
-└─ reference_data/
-   ├─ RxNorm_full_03022026/
-   ├─ drugbank_5.1.15/
-   └─ MedDRA/
+|-- FAERS-Compound-PT-SOC-Graphs/
+|-- raw_data/
+|   `-- faers_quarterly_archives/
+`-- reference_data/
+    |-- RxNorm_full_03022026/
+    |-- drugbank_5.1.15/
+    `-- MedDRA/
 ```
 
 In other words:
@@ -82,6 +83,16 @@ The recommended default graph is `ge20`, because it provides the best balance be
 
 ![Graph comparison](figures/graph_comparison.png)
 
+## Reference Tables Included In This Public Repository
+
+The repository now includes three lightweight reference tables:
+
+- `tables/all_compounds_basic_info.xlsx`
+- `tables/all_reactions_basic_info_bilingual.xlsx`
+- `tables/all_soc_basic_info_bilingual.xlsx`
+
+These files provide the cleaned compound identifiers, bilingual PT names, and bilingual SOC names used by the released graphs.
+
 ## Included Files
 
 - `README.md`
@@ -89,17 +100,15 @@ The recommended default graph is `ge20`, because it provides the best balance be
 - `docs/`
 - `figures/`
 - `graphs/`
+- `tables/`
 - `release_manifest.json`
 
 See [docs/GRAPH_RELEASES.md](docs/GRAPH_RELEASES.md) for the released graph summary.
 
 ## Files Intentionally Not Uploaded
 
-This public repository does **not** include the local full cleaned reference tables, such as:
+This public repository still does **not** include the full PS/SS association matrices:
 
-- all compounds table
-- all PT bilingual table
-- all SOC bilingual table
 - full PS compound-PT association table
 - full SS compound-PT association table
 

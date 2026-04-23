@@ -1,21 +1,26 @@
 {
   "repository_name": "FAERS-Compound-PT-SOC-Graphs",
-  "scope": "Step1-Step6 preprocessing and three final pruned core graphs only",
+  "scope": "Step1-Step6 preprocessing, three final pruned core graphs, and three lightweight reference tables",
+  "reference_tables": [
+    "all_compounds_basic_info.xlsx",
+    "all_reactions_basic_info_bilingual.xlsx",
+    "all_soc_basic_info_bilingual.xlsx"
+  ],
   "graphs": [
     {
       "graph_version": "ge10",
       "file": "step6_compound_pt_soc_core_ge10.sqlite.gz",
-      "compressed_gzip_bytes": 31820065
+      "compressed_gzip_bytes": 32565311
     },
     {
       "graph_version": "ge20",
       "file": "step6_compound_pt_soc_core_ge20.sqlite.gz",
-      "compressed_gzip_bytes": 19078187
+      "compressed_gzip_bytes": 19485828
     },
     {
       "graph_version": "ge30",
       "file": "step6_compound_pt_soc_core_ge30.sqlite.gz",
-      "compressed_gzip_bytes": 13978548
+      "compressed_gzip_bytes": 14257236
     }
   ]
 }

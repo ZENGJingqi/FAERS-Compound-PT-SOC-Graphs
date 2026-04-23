@@ -16,13 +16,13 @@ To run the public scripts as documented, place the cloned repository beside `raw
 
 ```text
 your_working_directory/
-├─ FAERS-Compound-PT-SOC-Graphs/
-├─ raw_data/
-│  └─ faers_quarterly_archives/
-└─ reference_data/
-   ├─ RxNorm_full_03022026/
-   ├─ drugbank_5.1.15/
-   └─ MedDRA/
+|-- FAERS-Compound-PT-SOC-Graphs/
+|-- raw_data/
+|   `-- faers_quarterly_archives/
+`-- reference_data/
+    |-- RxNorm_full_03022026/
+    |-- drugbank_5.1.15/
+    `-- MedDRA/
 ```
 
 This is the directory convention assumed by the default script arguments in `code/`.
@@ -86,3 +86,13 @@ These versions are defined by the minimum `n_reports` threshold applied to `comp
 ## 5. Recommended graph
 
 The recommended default graph is `ge20`, because it offers the best balance between lower noise and broader coverage.
+
+## 6. Public reference tables
+
+The public repository also includes three small reference tables:
+
+1. `tables/all_compounds_basic_info.xlsx`
+2. `tables/all_reactions_basic_info_bilingual.xlsx`
+3. `tables/all_soc_basic_info_bilingual.xlsx`
+
+These are intended for quick inspection of the released entities without exposing the full large-scale PS/SS association tables.
