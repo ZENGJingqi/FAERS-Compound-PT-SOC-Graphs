@@ -1,6 +1,6 @@
 # FAERS Preprocessing and Core Heterograph Package
 
-This repository-ready package contains only data collection notes, preprocessing code, curated documentation, reference tables, and three pruned FAERS core graphs. It does not include any downstream modeling or prediction results.
+This repository-ready package contains only data collection notes, preprocessing code, curated documentation, figures, and three pruned FAERS core graphs. It does not include any downstream modeling or prediction results.
 
 ## Scope
 
@@ -15,7 +15,6 @@ The package documents how raw FAERS data were transformed into standardized comp
 
 - `docs/`: process notes and execution notes
 - `figures/`: English workflow and graph summary figures
-- `tables/`: English summary tables and cleaned reference tables
 - `graphs/`: three pruned graph archives (`ge10`, `ge20`, `ge30`) compressed as `.sqlite.gz`
 - `code/`: final preprocessing and graph-building scripts
 
@@ -38,19 +37,25 @@ The package provides three pruned graph versions:
 
 The recommended default graph is `ge20`, which gives the best tradeoff between coverage and noise control.
 
-## Files required for reproduction
+## Files included in this public repository
 
-- `tables/data_collection_versions.csv`
-- `tables/graph_summary.csv`
-- `tables/stage_changes.csv`
-- `tables/data_overview.csv`
-- `tables/all_compounds_basic_info.xlsx`
-- `tables/all_reactions_basic_info_bilingual.xlsx`
-- `tables/all_soc_basic_info_bilingual.xlsx`
-- `tables/all_compound_pt_ps_associations_bilingual.csv.gz`
-- `tables/all_compound_pt_ss_associations_bilingual.csv.gz`
-- `code/`
+- `README.md`
+- `docs/`
+- `figures/`
 - `graphs/`
+- `code/`
+
+## Files intentionally not uploaded
+
+The public repository does not include the full cleaned reference tables, including:
+
+- all compounds table
+- all PT bilingual table
+- all SOC bilingual table
+- full PS compound-PT association table
+- full SS compound-PT association table
+
+These files are retained only in the local expert package.
 
 ## Notes about graph archives
 

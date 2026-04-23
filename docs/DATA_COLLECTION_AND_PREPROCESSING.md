@@ -10,7 +10,7 @@ The preprocessing workflow used the following local datasets:
 4. MedDRA `29.0` English
 5. MedDRA `29.0` Chinese
 
-The source/version table is provided in `tables/data_collection_versions.csv`.
+The source and version information are documented directly in this file for public release.
 
 ## 2. Preprocessing workflow
 
@@ -62,15 +62,17 @@ Result:
 - reaction rows mapped to MedDRA PT: 59,395,333
 - distinct MedDRA PT: 22,643
 
-## 3. Full cleaned reference tables
+## 3. Full cleaned reference data retained locally
 
-The package includes the full cleaned reference tables:
+The local expert package retains the following full cleaned reference data:
 
 - all compounds: 3,732 rows
 - all PT nodes: 21,674 rows
 - all SOC nodes: 27 rows
 - all PS compound-PT associations: 1,807,206 rows
 - all SS compound-PT associations: 2,092,482 rows
+
+These full reference tables are not included in the public GitHub repository.
 
 ## 4. Core graph construction
 
@@ -89,7 +91,7 @@ Graph versions are defined by the minimum `n_reports` threshold applied to `comp
 - `ge20`
 - `ge30`
 
-The graph summary table is provided in `tables/graph_summary.csv`.
+The public repository includes the three graph archives directly under `graphs/`.
 
 ## 6. Recommended graph
 
