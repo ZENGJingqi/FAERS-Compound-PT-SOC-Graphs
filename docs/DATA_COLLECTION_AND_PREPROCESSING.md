@@ -1,4 +1,4 @@
-# Data Collection, Preprocessing, and Graph Construction
+# Data Collection, Preprocessing, and Core Graph Construction
 
 ## 1. Data collection
 
@@ -10,61 +10,45 @@ The preprocessing workflow used the following local datasets:
 4. MedDRA `29.0` English
 5. MedDRA `29.0` Chinese
 
-The source and version information are documented directly in this file for public release.
-
-## 2. Preprocessing workflow
+## 2. Step1-Step6 workflow
 
 ### Step1. Case deduplication
-
 - remove duplicate and superseded FAERS case versions
 - retain the latest valid case record
-
-Result:
-- latest deduplicated cases: 19,961,057
+- result: 19,961,057 latest valid cases
 
 ### Step2. Case-drug and case-reaction tables
+- build normalized `case_drug` and `case_reaction` tables
+- result: 72,212,791 case_drug rows and 59,395,334 case_reaction rows
 
-- build normalized `case_drug` and `case_reaction` tables after case-level deduplication
-
-Result:
-- case_drug rows: 72,212,791
-- case_reaction rows: 59,395,334
-
-### Step3. Drug name normalization and DrugBank linkage
-
+### Step3. Drug term normalization and DrugBank linkage
 - normalize raw drug terms
 - map to RxNorm / DrugBank-compatible names
 - manually curate high-frequency unmapped terms
 - anchor structure linkage using DrugBank InChI
-
-Result:
-- unique drug terms: 702,719
-- terms mapped to InChI: 183,162
-- drug rows mapped to InChI: 53,858,885
+- result: 702,719 unique drug terms, 183,162 terms mapped to InChI, 53,858,885 drug rows mapped to InChI
 
 ### Step4. Structure normalization
-
 - standardize linked structures
 - retain `InChIKey`, `inchi_std`, and `smiles_std`
 - use `InChIKey` as the unique compound identifier
-
-Result:
-- unique InChIKey: 4,523
-- InChIKey observed in PS/SS reports: 3,758
+- result: 4,523 unique InChIKey, with 3,758 observed in PS/SS reports
 
 ### Step5. Reaction normalization
-
 - normalize reaction terms to MedDRA Preferred Terms (PT)
 - assign MedDRA primary System Organ Class (SOC)
 - add bilingual PT and SOC names using MedDRA English and Chinese
+- result: 59,395,333 reaction rows mapped to MedDRA PT, with 22,643 distinct PT terms
 
-Result:
-- reaction rows mapped to MedDRA PT: 59,395,333
-- distinct MedDRA PT: 22,643
+### Step6. Core graph construction
+The final core graph keeps only:
+- nodes: `compound`, `pt`, `soc`
+- edges: `compound_has_pt_ps`, `compound_has_pt_ss`, `pt_belongs_to_primary_soc`
+- edge weight: `n_reports` for `compound -> pt`
 
 ## 3. Full cleaned reference data retained locally
 
-The local expert package retains the following full cleaned reference data:
+The local non-public expert package retains:
 
 - all compounds: 3,732 rows
 - all PT nodes: 21,674 rows
@@ -72,31 +56,16 @@ The local expert package retains the following full cleaned reference data:
 - all PS compound-PT associations: 1,807,206 rows
 - all SS compound-PT associations: 2,092,482 rows
 
-These full reference tables are not included in the public GitHub repository.
+## 4. Public graph versions
 
-## 4. Core graph construction
-
-The final core graph retains only:
-
-- nodes: `compound`, `pt`, `soc`
-- edges: `compound_has_pt_ps`, `compound_has_pt_ss`, `pt_belongs_to_primary_soc`
-
-No report nodes, compound-compound edges, archetype nodes, or downstream model outputs are included.
-
-## 5. Pruned graph versions
-
-Graph versions are defined by the minimum `n_reports` threshold applied to `compound -> pt` edges:
+The public repository includes three pruned graph releases:
 
 - `ge10`
 - `ge20`
 - `ge30`
 
-The public repository includes the three graph archives directly under `graphs/`.
+These versions are defined by the minimum `n_reports` threshold applied to `compound -> pt` edges.
 
-## 6. Recommended graph
+## 5. Recommended graph
 
-The recommended default graph is `ge20`, because it offers the best balance between:
-
-- lower noise than `ge10`
-- broader coverage than `ge30`
-- manageable graph size for downstream use
+The recommended default graph is `ge20`, because it offers the best balance between lower noise and broader coverage.
