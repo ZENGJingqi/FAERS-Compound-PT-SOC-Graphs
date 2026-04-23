@@ -25,10 +25,10 @@ The released workflow covers only:
 - MedDRA English: `29.0`
 - MedDRA Chinese: `29.0`
 
-## Main Outputs
+## Repository Structure
 
 - `code/`: final Step1-Step6 preprocessing and graph-building scripts
-- `docs/`: English process notes and execution notes
+- `docs/`: English process notes, execution notes, and graph release notes
 - `figures/`: workflow and graph summary figures
 - `graphs/`: three pruned graph archives compressed as `.sqlite.gz`
 
@@ -62,7 +62,7 @@ The recommended default graph is `ge20`, because it provides the best balance be
 
 ![Graph comparison](figures/graph_comparison.png)
 
-## Files Included
+## Included Files
 
 - `README.md`
 - `code/`
@@ -70,6 +70,8 @@ The recommended default graph is `ge20`, because it provides the best balance be
 - `figures/`
 - `graphs/`
 - `release_manifest.json`
+
+See [docs/GRAPH_RELEASES.md](docs/GRAPH_RELEASES.md) for the released graph summary.
 
 ## Files Intentionally Not Uploaded
 
