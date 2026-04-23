@@ -1,0 +1,6 @@
+dataset,version_or_range,local_source,usage
+FAERS / AERS,2004Q1-2025Q4,Local quarterly ASCII archives,"Original case, drug, and reaction data"
+RxNorm,RxNorm_full_03022026,Local download,Drug name normalization
+DrugBank,5.1.15,Local download,Drug structure linkage and identifiers
+MedDRA English,29.0,Local download,Reaction normalization to PT and primary SOC
+MedDRA Chinese,29.0,Local download,Bilingual PT and SOC annotation

@@ -1,0 +1,30 @@
+{
+  "package_dir": "D:\\博士文件\\TCMMKG\\data\\AEMS_FDA不良反应数据\\smiles_adr_project\\github_release_preprocessing_graphs_2026-04-23",
+  "graphs": [
+    {
+      "graph_version": "ge10",
+      "original_sqlite_bytes": 128385024,
+      "compressed_gzip_bytes": 32565306,
+      "sha256_gzip": "18b2feee03fd2aa3e5d82e69ff0b289e62c85308c752899009264ab7e2f6bb07"
+    },
+    {
+      "graph_version": "ge20",
+      "original_sqlite_bytes": 77492224,
+      "compressed_gzip_bytes": 19485823,
+      "sha256_gzip": "1b2f894c7cd90e428d5c8f50c0622a5f2a98d8ce4c2f83d4409e8c73fa5805ca"
+    },
+    {
+      "graph_version": "ge30",
+      "original_sqlite_bytes": 57106432,
+      "compressed_gzip_bytes": 14257231,
+      "sha256_gzip": "7d3cb6524a82dee783dd5e87b06e6318513c10bb103d6f83d8b3f4a30cbe12e8"
+    }
+  ],
+  "full_cleaned_counts": {
+    "compound_rows": 3732,
+    "reaction_rows": 21674,
+    "soc_rows": 27,
+    "ps_association_rows": 1807206,
+    "ss_association_rows": 2092482
+  }
+}

@@ -1,0 +1,5 @@
+graph_version,compound_nodes,pt_nodes,soc_nodes,ps_edges,ss_edges,pt_soc_edges
+full_cleaned_data,3732,21674,27,1807206,2092482,21674
+n_reports>=10,2006,9917,27,339013,459064,9917
+n_reports>=20,1707,7274,27,202917,279990,7274
+n_reports>=30,1564,6035,27,148522,207842,6035
