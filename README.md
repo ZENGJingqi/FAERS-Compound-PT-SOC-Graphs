@@ -2,6 +2,10 @@
 
 This repository-ready package contains only data collection notes, preprocessing code, curated documentation, figures, and three pruned FAERS core graphs. It does not include any downstream modeling or prediction results.
 
+## Workflow Overview
+
+![Workflow overview](figures/workflow_overview.png)
+
 ## Scope
 
 The package documents how raw FAERS data were transformed into standardized compound-PT-SOC graphs using:
@@ -36,6 +40,10 @@ The package provides three pruned graph versions:
 - `ge30`: keep `compound -> pt` edges with `n_reports >= 30`
 
 The recommended default graph is `ge20`, which gives the best tradeoff between coverage and noise control.
+
+## Graph Summary
+
+![Graph comparison](figures/graph_comparison.png)
 
 ## Files included in this public repository
 
